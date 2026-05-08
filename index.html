@@ -15,7 +15,6 @@
             --dirt-brown: #795548;
             --danger-red: #F44336;
             --white: #ffffff;
-            /* URL Direct Link untuk Google Drive Image */
             --bg-url: url('https://lh3.googleusercontent.com/d/1s2FDLgdF1D9aPruGquj0vovhr-9PmX9N');
         }
 
@@ -27,7 +26,6 @@
             color: #333;
             overflow-x: hidden;
             user-select: none;
-            /* Latar belakang global untuk seluruh aplikasi */
             background-image: var(--bg-url);
             background-size: cover;
             background-position: center;
@@ -36,7 +34,6 @@
             min-height: 100vh;
         }
 
-        /* Overlay tipis agar teks lebih mudah dibaca jika background terlalu ramai */
         body::before {
             content: "";
             position: fixed;
@@ -63,6 +60,27 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* Tombol Kontrol Musik */
+        #music-control {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 2000;
+            background: white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            font-size: 24px;
+            border: 3px solid var(--primary-green);
+            transition: transform 0.2s;
+        }
+        #music-control:active { transform: scale(0.9); }
 
         .btn {
             background: var(--primary-green);
@@ -287,7 +305,7 @@
             padding: 25px;
             border-radius: 30px;
             box-shadow: 0 0 100px rgba(0,0,0,0.5);
-            z-index: 1000;
+            z-index: 3000;
             text-align: center;
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             width: 280px;
@@ -302,6 +320,14 @@
     </style>
 </head>
 <body>
+
+    <!-- Musik Latar Baru (Melodi yang Jauh Lebih Ceria & Cepat) -->
+    <audio id="bg-music" loop preload="auto">
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Kontrol Musik -->
+    <div id="music-control" onclick="toggleMusic()">🔇</div>
 
     <div id="feedback-pop">
         <h2 id="feedback-title">Hebat!</h2>
@@ -322,7 +348,7 @@
         <div class="card">
             <h3>Siapa Namamu?</h3>
             <input type="text" id="player-name" placeholder="Tulis namamu..." style="padding: 15px; border-radius: 15px; border: 3px solid #eee; width: 85%; margin-bottom: 15px; font-size: 1rem; outline: none; font-family: inherit;">
-            <button class="btn" onclick="startGame()">Ayo Mulai!</button>
+            <button class="btn" onclick="startGame()">Ayo Mulai! 🚀</button>
         </div>
     </div>
 
@@ -357,7 +383,7 @@
         </div>
     </div>
 
-    <!-- Misi 1: Sorting -->
+    <!-- Misi Screens -->
     <div id="misi-1" class="screen">
         <div class="card">
             <h2>Misi: Pilah Sampah</h2>
@@ -377,7 +403,6 @@
         </div>
     </div>
 
-    <!-- Misi 2: Compost -->
     <div id="misi-2" class="screen">
         <div class="card">
             <h2>Misi: Pahlawan Kompos</h2>
@@ -393,7 +418,6 @@
         </div>
     </div>
 
-    <!-- Misi 3: City -->
     <div id="misi-3" class="screen">
         <div class="card">
             <h2>Misi: Bangun Kota Hijau</h2>
@@ -416,7 +440,6 @@
         </div>
     </div>
 
-    <!-- Badge Screen -->
     <div id="badge-screen" class="screen">
         <div class="card">
             <h2>Koleksi Badge Kamu</h2>
@@ -425,7 +448,6 @@
         </div>
     </div>
 
-    <!-- Cert Screen -->
     <div id="cert-screen" class="screen">
         <div class="card" style="border: 8px double var(--primary-green); padding: 30px;">
             <div style="font-size: 50px;">📜</div>
@@ -439,6 +461,32 @@
     </div>
 
     <script>
+        const audio = document.getElementById('bg-music');
+        const musicBtn = document.getElementById('music-control');
+        let isMusicPlaying = false;
+
+        function tryPlayMusic() {
+            audio.play().then(() => {
+                isMusicPlaying = true;
+                musicBtn.innerText = '🔊';
+                musicBtn.style.borderColor = 'var(--primary-green)';
+            }).catch(error => {
+                console.log("Audio dicegah oleh browser. Perlu klik manual.");
+                isMusicPlaying = false;
+                musicBtn.innerText = '🔇';
+            });
+        }
+
+        function toggleMusic() {
+            if (isMusicPlaying) {
+                audio.pause();
+                musicBtn.innerText = '🔇';
+                isMusicPlaying = false;
+            } else {
+                tryPlayMusic();
+            }
+        }
+
         let gameState = {
             playerName: "Hero",
             xp: 0,
@@ -463,8 +511,8 @@
                 const gain = ctx.createGain();
                 if(type === 'win') {
                     osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(500, ctx.currentTime);
-                    osc.frequency.exponentialRampToValueAtTime(1000, ctx.currentTime + 0.1);
+                    osc.frequency.setValueAtTime(600, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.1);
                 } else {
                     osc.type = 'sawtooth';
                     osc.frequency.setValueAtTime(150, ctx.currentTime);
@@ -496,6 +544,9 @@
             }
             gameState.playerName = name;
             document.getElementById('display-name').innerText = name;
+            
+            // PENTING: Musik dipicu begitu game dimulai
+            tryPlayMusic();
             goHome();
         }
 
@@ -513,6 +564,9 @@
             document.getElementById('player-name').value = '';
             document.getElementById('xp-val').innerText = '0';
             showScreen('welcome-screen');
+            audio.pause();
+            isMusicPlaying = false;
+            musicBtn.innerText = '🔇';
         }
 
         function showFeedback(title, icon, msg) {
@@ -525,7 +579,6 @@
 
         function closeFeedback() { document.getElementById('feedback-pop').classList.remove('show'); }
 
-        // --- Misi 1 ---
         const trashItems = [
             { id: 1, type: "organic", icon: "🍌", name: "Kulit Pisang" },
             { id: 2, type: "organic", icon: "🍎", name: "Apel Busuk" },
@@ -577,7 +630,6 @@
             }
         }
 
-        // --- Misi 2 ---
         const compStuff = [
             { icon: "🍂", type: "good", name: "Daun" },
             { icon: "🥫", type: "bad", name: "Kaleng", msg: "Logam tidak bisa terurai!" },
@@ -624,7 +676,6 @@
             }, 1200);
         }
 
-        // --- Misi 3 ---
         function selectCity(icon, type, btn) {
             gameState.selectedItem = icon;
             gameState.selectedType = type;
